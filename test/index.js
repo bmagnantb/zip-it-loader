@@ -80,7 +80,7 @@ describe('zip-it-loader', function() {
 
 		it('should return a zip of directory containing source file', function() {
 			var files = JSZip(zipResult).files
-			expect(files).to.contain.all.keys(booksFilePaths.concat('books/zip-it.config.js'))
+			expect(files).to.contain.all.keys(booksFilePaths.concat('books/zip-it.config.json'))
 			expect(files).to.have.property('books/').that.has.property('dir', true)
 			expect(files).to.have.property('books/melville/').that.has.property('dir', true)
 		})
@@ -90,7 +90,7 @@ describe('zip-it-loader', function() {
 		})
 	})
 
-	context('when called on a zip-it.config.js file', function() {
+	context('when called on a zip-it.config.json file', function() {
 		context('', function() {
 			var zipResult
 			var addedDependencies = []
@@ -103,7 +103,7 @@ describe('zip-it-loader', function() {
 						done()
 					},
 					context: 'test/books',
-					resourcePath: 'test/books/zip-it.config.js'
+					resourcePath: 'test/books/zip-it.config.json'
 				})
 				fs.readFile(mock.resourcePath, function(err, result) {
 					loader.call(mock, result)
@@ -117,7 +117,7 @@ describe('zip-it-loader', function() {
 				})
 				expect(files).to.contain.all.keys(newFilePaths.concat('old-books/books.js'))
 				expect(files).to.have.property('old-books/').that.has.property('dir', true)
-				expect(files).to.have.property('old-books/melville').that.has.property('dir', true)
+				expect(files).to.have.property('old-books/melville/').that.has.property('dir', true)
 			})
 		})
 	})

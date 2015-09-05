@@ -10,10 +10,16 @@ module.exports = function(source) {
 	var cb = this.async()
 	var loader = this
 
+	var completed
 	var zip = JSZip()
-	var completed = source.toString() !== ''
-		? zipFile(zip, this.resourcePath)
-		: zipDirectory(zip, this).then(Bluebird.all)
+	if (this.resourcePath.indexOf('zip-it.config.json') !== -1) {
+		var sourceString = source.toString()
+		var options = JSON.parse(sourceString.substr(sourceString.indexOf('{')))
+		completed = zipDirectoryWithConfig(zip, loader, options)
+	} else if (source.toString() === '')
+		completed = zipDirectory(zip, this)
+	else
+		completed = zipFile(zip, this.resourcePath)
 
 	completed.then(function() {
 		cb(null, zip.generate({type: 'nodebuffer'}))
@@ -30,6 +36,12 @@ function zipFile(zip, filePath) {
 function zipDirectory(zip, loader) {
 	var fileName = path.basename(loader.resourcePath)
 	var directoryName = fileName.substr(0, fileName.indexOf('.'))
+	return addFilesToZipDirectory(loader.context, zip.folder(directoryName), loader).then(Bluebird.all)
+}
+
+function zipDirectoryWithConfig(zip, loader, options) {
+	var directoryName = options.name
+	console.log(directoryName)
 	return addFilesToZipDirectory(loader.context, zip.folder(directoryName), loader).then(Bluebird.all)
 }
 

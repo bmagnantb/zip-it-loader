@@ -25,6 +25,13 @@ var makeSpyAddDependency = function(addedDependencies) {
 	}
 }
 
+var booksFilePaths = [
+	'books/heart-of-darkness.txt',
+	'books/phantastes.txt',
+	'books/melville/moby-dick.txt',
+	'books/melville/bartleby-the-scrivener.txt'
+]
+
 describe('zip-it-loader', function() {
 
 	it('should be a function', function() {
@@ -41,7 +48,9 @@ describe('zip-it-loader', function() {
 					done()
 				}
 			})
-			loader.call(mock, fs.readFileSync(mock.resourcePath))
+			fs.readFile(mock.resourcePath, function(err, result) {
+				loader.call(mock, result)
+			})
 		})
 
 		it('should return a zip with one file', function() {
@@ -64,23 +73,52 @@ describe('zip-it-loader', function() {
 				context: 'test/books',
 				resourcePath: 'test/books/books.js'
 			})
-			loader.call(mock, fs.readFileSync(mock.resourcePath))
+			fs.readFile(mock.resourcePath, function(err, result) {
+				loader.call(mock, result)
+			})
 		})
 
 		it('should return a zip of directory containing source file', function() {
 			var files = JSZip(zipResult).files
-			expect(files).to.contain.all.keys([
-				'books/heart-of-darkness.txt',
-				'books/phantastes.txt',
-				'books/melville/moby-dick.txt',
-				'books/melville/bartleby-the-scrivener.txt'
-			])
+			expect(files).to.contain.all.keys(booksFilePaths.concat('books/zip-it.config.js'))
 			expect(files).to.have.property('books/').that.has.property('dir', true)
 			expect(files).to.have.property('books/melville/').that.has.property('dir', true)
 		})
 
 		it('should add all files as dependencies', function() {
-			expect(addedDependencies).to.have.length(4)
+			expect(addedDependencies).to.have.length(5)
+		})
+	})
+
+	context('when called on a zip-it.config.js file', function() {
+		context('', function() {
+			var zipResult
+			var addedDependencies = []
+			before(function(done) {
+				var mock = _.assign({}, defaultMock, {
+					addDependency: makeSpyAddDependency(addedDependencies),
+					callback: function(err, result) {
+						if (err) throw err
+						zipResult = result
+						done()
+					},
+					context: 'test/books',
+					resourcePath: 'test/books/zip-it.config.js'
+				})
+				fs.readFile(mock.resourcePath, function(err, result) {
+					loader.call(mock, result)
+				})
+			})
+
+			it('should have base dir named by name field', function() {
+				var files = JSZip(zipResult).files
+				var newFilePaths = booksFilePaths.map(function(val) {
+					return 'old-' + val
+				})
+				expect(files).to.contain.all.keys(newFilePaths.concat('old-books/books.js'))
+				expect(files).to.have.property('old-books/').that.has.property('dir', true)
+				expect(files).to.have.property('old-books/melville').that.has.property('dir', true)
+			})
 		})
 	})
 })

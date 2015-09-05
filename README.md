@@ -6,7 +6,7 @@ a zipped version of that file or a zipped version of the
 file's directory.
 
 ## installation
-npm install zip-it-loader
+`npm install zip-it-loader`
 
 ## usage
 [Webpack Loaders](http://webpack.github.io/docs/using-loaders.html)

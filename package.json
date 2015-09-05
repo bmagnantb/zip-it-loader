@@ -4,7 +4,8 @@
   "description": "zip files or directories loader for webpack",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "prepublish": "npm run test"
   },
   "keywords": [
     "zip",

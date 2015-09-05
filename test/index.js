@@ -7,6 +7,7 @@ var _ = require('lodash')
 var loader = require('..')
 
 var expect = Chai.expect
+
 var defaultMock = {
 	addDependency: function() {},
 	async: function() {
@@ -16,6 +17,12 @@ var defaultMock = {
 	callback: function(err) { if (err) throw err },
 	context: 'test',
 	resourcePath: 'test/picture-of-dorian-gray.txt'
+}
+
+var makeSpyAddDependency = function(addedDependencies) {
+	return function(dependency) {
+		addedDependencies.push(dependency)
+	}
 }
 
 describe('zip-it-loader', function() {
@@ -45,8 +52,10 @@ describe('zip-it-loader', function() {
 
 	context('when called on a file with no content', function() {
 		var zipResult
+		var addedDependencies = []
 		before(function(done) {
 			var mock = _.assign({}, defaultMock, {
+				addDependency: makeSpyAddDependency(addedDependencies),
 				callback: function(err, result) {
 					if (err) throw err
 					zipResult = result
@@ -68,6 +77,10 @@ describe('zip-it-loader', function() {
 			])
 			expect(files).to.have.property('books/').that.has.property('dir', true)
 			expect(files).to.have.property('books/melville/').that.has.property('dir', true)
+		})
+
+		it('should add all files as dependencies', function() {
+			expect(addedDependencies).to.have.length(4)
 		})
 	})
 })

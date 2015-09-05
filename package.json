@@ -1,0 +1,33 @@
+{
+  "name": "zip-it-loader",
+  "version": "0.1.0",
+  "description": "zip files or directories loader for webpack",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [
+    "zip",
+    "loader",
+    "webpack"
+  ],
+  "author": {
+    "name": "Ben Magnant Brown",
+    "email": "bmagnantb@gmail.com",
+    "url": "bmagnantb.github.io"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:bmagnantb/zip-it-loader.git"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "bluebird": "2.9.34",
+    "jszip": "2.5.0"
+  },
+  "devDependencies": {
+    "chai": "^3.2.0",
+    "lodash": "^3.10.1",
+    "mocha": "^2.3.0"
+  }
+}

@@ -12,7 +12,7 @@ module.exports = function(source) {
 
 	var zip = JSZip()
 	var completed = source.toString() !== ''
-		? zipFile(zip, this)
+		? zipFile(zip, this.resourcePath)
 		: zipDirectory(zip, this).then(Bluebird.all)
 
 	completed.then(function() {
@@ -20,10 +20,9 @@ module.exports = function(source) {
 	})
 }
 
-function zipFile(zip, loader) {
-	loader.addDependency(loader.resourcePath)
-	return fs.readFileAsync(loader.resourcePath).then(function(buf) {
-		zip.file(path.basename(loader.resourcePath), buf)
+function zipFile(zip, filePath) {
+	return fs.readFileAsync(filePath).then(function(buf) {
+		zip.file(path.basename(filePath), buf)
 		return zip
 	})
 }

@@ -6,12 +6,12 @@ a zipped version of that file or a zipped version of the
 file's directory.
 
 ## installation
-coming soon...
+npm install zip-it-loader
 
 ## usage
 [Webpack Loaders](http://webpack.github.io/docs/using-loaders.html)
 
-likely used with file loader:
+likely used with [file loader](https://github.com/webpack/file-loader):
 `file?name=[name].zip!zip-it`
 
 ### zip file only

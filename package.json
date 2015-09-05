@@ -14,16 +14,18 @@
   "author": {
     "name": "Ben Magnant Brown",
     "email": "bmagnantb@gmail.com",
-    "url": "bmagnantb.github.io"
+    "url": "http://bmagnantb.github.io"
   },
+  "homepage": "https://github.com/bmagnantb/zip-it-loader",
+  "bugs": "https://github.com/bmagnantb/zip-it-loader/issues",
   "repository": {
     "type": "git",
     "url": "git@github.com:bmagnantb/zip-it-loader.git"
   },
   "license": "MIT",
   "dependencies": {
-    "bluebird": "2.9.34",
-    "jszip": "2.5.0"
+    "bluebird": "^2.9.34",
+    "jszip": "^2.5.0"
   },
   "devDependencies": {
     "chai": "^3.2.0",

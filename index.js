@@ -12,10 +12,11 @@ module.exports = function(source) {
 
 	var completed
 	var zip = JSZip()
-	if (this.resourcePath.indexOf('zip-it.config.json') !== -1) {
+	if (this.resourcePath.indexOf('.json') !== -1) {
 		var sourceString = source.toString()
 		var options = JSON.parse(sourceString.substr(sourceString.indexOf('{')))
-		completed = zipDirectoryWithConfig(zip, loader, options)
+		if (options['zip-it-config']) completed = zipDirectoryWithConfig(zip, loader, options)
+		else completed = zipFile(zip, this.resourcePath)
 	} else if (source.toString() === '')
 		completed = zipDirectory(zip, this)
 	else
@@ -53,7 +54,6 @@ function addFilesToZipDirectory(directory, zip, loader, filter) {
 		var resultArray = result.toString().split(',').filter(function(val) {
 			var pathFromTopDir = directory.substr(directory.indexOf(loader.context) + loader.context.length + 1)
 			var valFromTopDir = pathFromTopDir ? pathFromTopDir + '/' + val : val
-			// console.log('val', pathFromTopDir, valFromTopDir, filter(valFromTopDir))
 			return val !== path.basename(loader.resourcePath) && filter(valFromTopDir)
 		})
 

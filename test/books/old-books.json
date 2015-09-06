@@ -1,4 +1,5 @@
 {
+	"zip-it-config": true,
 	"name": "old-books",
 	"exclude": [
 		"heart-of-darkness.txt",

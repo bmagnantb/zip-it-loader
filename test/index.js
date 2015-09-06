@@ -31,11 +31,12 @@ var booksFilePaths = [
 	'books/melville/moby-dick.txt',
 	'books/melville/bartleby-the-scrivener.txt',
 	'books/',
-	'books/melville/'
+	'books/melville/',
+	'books/test.json'
 ]
 
-var options = require('./books/zip-it.config.json')
-var options2 = require('./books2/zip-it.config.json')
+var options = require('./books/old-books.json')
+var options2 = require('./books2/read-these.json')
 
 describe('zip-it-loader', function() {
 
@@ -85,77 +86,103 @@ describe('zip-it-loader', function() {
 
 		it('should return a zip of directory containing source file', function() {
 			var files = zipResult.files
-			expect(files).to.have.all.keys(booksFilePaths.concat('books/zip-it.config.json'))
+			expect(files).to.have.all.keys(booksFilePaths.concat('books/old-books.json'))
 			expect(files).to.have.property('books/').that.has.property('dir', true)
 			expect(files).to.have.property('books/melville/').that.has.property('dir', true)
 		})
 
 		it('should add all files as dependencies', function() {
-			expect(addedDependencies).to.have.length(5)
+			expect(addedDependencies).to.have.length(6)
 		})
 	})
 
-	context('when called on a zip-it.config.json file', function() {
-		var zipResult
-		before(function(done) {
-			var mock = _.assign({}, defaultMock, {
-				callback: function(err, result) {
-					if (err) throw err
-					zipResult = JSZip(result)
-					done()
-				},
-				context: 'test/books',
-				resourcePath: 'test/books/zip-it.config.json'
-			})
-			fs.readFile(mock.resourcePath, function(err, result) {
-				loader.call(mock, result)
-			})
-		})
+	context('when called on a .json file', function() {
 
-		it('should have base dir named by name field', function() {
-			var files = zipResult.files
-			expect(files).to.have.property(options.name + '/').that.has.property('dir', true)
-		})
-
-		context('with exclude field', function() {
-			it('should not have excluded files', function() {
-				var files = zipResult.files
-				var newFilePaths = booksFilePaths.filter(function(val) {
-					var unprefixedFile = val.substr(val.indexOf('/') + 1)
-					return options.exclude.indexOf(unprefixedFile) === -1
-				}).map(function(val) {
-					return options.name + val.substr(val.indexOf('/'))
-				})
-				expect(files).to.have.all.keys(newFilePaths.concat(options.name + '/books.js'))
-			})
-		})
-
-		context('with include field', function() {
-			var zipResult2
+		context('that does not have a zip-it-config field set to true', function() {
+			var zipResult
 			before(function(done) {
 				var mock = _.assign({}, defaultMock, {
 					callback: function(err, result) {
 						if (err) throw err
-						zipResult2 = JSZip(result)
+						zipResult = JSZip(result)
 						done()
 					},
-					context: 'test/books2',
-					resourcePath: 'test/books2/zip-it.config.json'
+					context: 'test/books',
+					resourcePath: 'test/books/test.json'
 				})
 				fs.readFile(mock.resourcePath, function(err, result) {
 					loader.call(mock, result)
 				})
 			})
 
-			it('should only have included files', function() {
-				var files = zipResult2.files
-				var newFilePaths = booksFilePaths.filter(function(val) {
-					var unprefixedFile = val.substr(val.indexOf('/') + 1)
-					return options2.include.indexOf(unprefixedFile) !== -1 || unprefixedFile.indexOf('.') === -1
-				}).map(function(val) {
-					return options2.name + val.substr(val.indexOf('/'))
+			it('should zip the json file only', function() {
+				var files = zipResult.files
+				expect(files).to.have.all.keys('test.json')
+			})
+		})
+
+		context('that has zip-it-config field set to true', function() {
+			var zipResult
+			before(function(done) {
+				var mock = _.assign({}, defaultMock, {
+					callback: function(err, result) {
+						if (err) throw err
+						zipResult = JSZip(result)
+						done()
+					},
+					context: 'test/books',
+					resourcePath: 'test/books/old-books.json'
 				})
-				expect(files).to.have.all.keys(newFilePaths)
+				fs.readFile(mock.resourcePath, function(err, result) {
+					loader.call(mock, result)
+				})
+			})
+
+			it('should have base dir named by name field', function() {
+				var files = zipResult.files
+				expect(files).to.have.property(options.name + '/').that.has.property('dir', true)
+			})
+
+			context('with exclude field', function() {
+				it('should not have excluded files', function() {
+					var files = zipResult.files
+					var newFilePaths = booksFilePaths.filter(function(val) {
+						var unprefixedFile = val.substr(val.indexOf('/') + 1)
+						return options.exclude.indexOf(unprefixedFile) === -1
+					}).map(function(val) {
+						return options.name + val.substr(val.indexOf('/'))
+					})
+					expect(files).to.have.all.keys(newFilePaths.concat(options.name + '/books.js'))
+				})
+			})
+
+			context('with include field', function() {
+				var zipResult2
+				before(function(done) {
+					var mock = _.assign({}, defaultMock, {
+						callback: function(err, result) {
+							if (err) throw err
+							zipResult2 = JSZip(result)
+							done()
+						},
+						context: 'test/books2',
+						resourcePath: 'test/books2/read-these.json'
+					})
+					fs.readFile(mock.resourcePath, function(err, result) {
+						loader.call(mock, result)
+					})
+				})
+
+				it('should only have included files', function() {
+					var files = zipResult2.files
+					var newFilePaths = booksFilePaths.filter(function(val) {
+						var unprefixedFile = val.substr(val.indexOf('/') + 1)
+						return options2.include.indexOf(unprefixedFile) !== -1 || unprefixedFile.indexOf('.') === -1
+					}).map(function(val) {
+						return options2.name + val.substr(val.indexOf('/'))
+					})
+					expect(files).to.have.all.keys(newFilePaths)
+				})
 			})
 		})
 	})

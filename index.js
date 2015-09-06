@@ -36,20 +36,26 @@ function zipFile(zip, filePath) {
 function zipDirectory(zip, loader) {
 	var fileName = path.basename(loader.resourcePath)
 	var directoryName = fileName.substr(0, fileName.indexOf('.'))
-	return addFilesToZipDirectory(loader.context, zip.folder(directoryName), loader).then(Bluebird.all)
+	var filter = getFilter({})
+	return addFilesToZipDirectory(loader.context, zip.folder(directoryName), loader, filter)
+		.then(Bluebird.all)
 }
 
 function zipDirectoryWithConfig(zip, loader, options) {
 	var directoryName = options.name
-	console.log(directoryName)
-	return addFilesToZipDirectory(loader.context, zip.folder(directoryName), loader).then(Bluebird.all)
+	var filter = getFilter(options)
+	return addFilesToZipDirectory(loader.context, zip.folder(directoryName), loader, filter)
+		.then(Bluebird.all)
 }
 
-function addFilesToZipDirectory(directory, zip, loader) {
+function addFilesToZipDirectory(directory, zip, loader, filter) {
 	return fs.readdirAsync(directory).then(function(result) {
-		var resultArray = result.toString().split(',')
-		var nameFileIndex = resultArray.indexOf(path.basename(loader.resourcePath))
-		if (nameFileIndex !== -1 && directory === loader.context) resultArray.splice(nameFileIndex, 1)
+		var resultArray = result.toString().split(',').filter(function(val) {
+			var pathFromTopDir = directory.substr(directory.indexOf(loader.context) + loader.context.length + 1)
+			var valFromTopDir = pathFromTopDir ? pathFromTopDir + '/' + val : val
+			return val !== path.basename(loader.resourcePath) && filter(valFromTopDir)
+		})
+
 		return resultArray.map(function(val) {
 			if (val.indexOf('.') !== -1) {
 				var filePath = directory + '/' + val
@@ -57,9 +63,15 @@ function addFilesToZipDirectory(directory, zip, loader) {
 				return fs.readFileAsync(filePath).then(function(buf) {
 					return zip.file(val, buf)
 				})
-			} else return addFilesToZipDirectory(directory + '/' + val, zip.folder(val), loader).then(Bluebird.all)
+			} else return addFilesToZipDirectory(directory + '/' + val, zip.folder(val), loader, filter).then(Bluebird.all)
 		})
 	})
+}
+
+function getFilter(options) {
+	if (options.exclude) return function(val) { return options.exclude.indexOf(val) === -1 }
+	if (options.include) return function(val) { return options.include.indexOf(val) !== -1 }
+	else return function() { return true }
 }
 
 

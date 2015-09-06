@@ -53,6 +53,7 @@ function addFilesToZipDirectory(directory, zip, loader, filter) {
 		var resultArray = result.toString().split(',').filter(function(val) {
 			var pathFromTopDir = directory.substr(directory.indexOf(loader.context) + loader.context.length + 1)
 			var valFromTopDir = pathFromTopDir ? pathFromTopDir + '/' + val : val
+			// console.log('val', pathFromTopDir, valFromTopDir, filter(valFromTopDir))
 			return val !== path.basename(loader.resourcePath) && filter(valFromTopDir)
 		})
 
@@ -70,8 +71,10 @@ function addFilesToZipDirectory(directory, zip, loader, filter) {
 
 function getFilter(options) {
 	if (options.exclude) return function(val) { return options.exclude.indexOf(val) === -1 }
-	if (options.include) return function(val) { return options.include.indexOf(val) !== -1 }
-	else return function() { return true }
+	if (options.include) return function(val) {
+		return options.include.indexOf(val) !== -1 || val.indexOf('.') === -1
+	}
+	return function() { return true }
 }
 
 

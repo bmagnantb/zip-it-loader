@@ -56,10 +56,10 @@ require('./file-name.json')
 ```
 
 available options:
-	+ name -- sets the name of the unzipped directory. the zip
-	file's name is based on the imported file's name if using
-	`file-loader?name=[name].zip`
-	+ exclude -- an array of strings to exclude. strings are written
-	from config file's directory, e.g. a subdirectory `images` would
-	be written `images/`
-	+ include -- an array of strings to include
++ name -- sets the name of the unzipped directory. the zip
+file's name is based on the imported file's name if using
+`file-loader?name=[name].zip`
++ exclude -- an array of strings to exclude. strings are written
+from config file's directory, e.g. a subdirectory `images` would
+be written `images/`
++ include -- an array of strings to include

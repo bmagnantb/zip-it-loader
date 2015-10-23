@@ -1,6 +1,6 @@
 {
   "name": "zip-it-loader",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "zip files or directories loader for webpack",
   "main": "index.js",
   "scripts": {

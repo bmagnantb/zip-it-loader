@@ -23,16 +23,16 @@ require('./file.txt') // not an empty file
 ### zip entire directory and sub-directories
 require an empty file in the directory you wish to zip.
 the file's name sans extension will be used as the unzipped
-directory's name and passed to file loader's `[name]`. the
-empty file is not included in the zip.
+directory's name and also passed to file loader's `[name]`. the
+empty file is not included in the zip. empty directories are not included.
 
 ```js
 require('./file.js') // must be completely empty
 ```
 
-### config for directory zipping
+### finer control directory zipping with config file
 require a json file with a field `zip-it-config: true`
-to distinguish from a json file intended for zipping alone.
+to distinguish from a json file intended for zipping.
 
 ```js
 require('./file-name.json')
@@ -40,26 +40,32 @@ require('./file-name.json')
 /* file-name.json */
 {
 	"zip-it-config": true,
-	"name": "file-name",
+	"name": "directory-name",
 	"exclude": [
 		"that-one-file.js",
-		"subdirectory/another-file.txt"
+		"^directory-at-config-level/",
+		"directory-at-any-level/another-file(.txt|.js)"
 	],
 
 	// or use include
 	// if both fields are present, only exclude is used
 
 	"include": [
-		"zip-only-this-as-a-directory.js"
+		"^zip-this-only-at-config-level.js"
 	]
 }
 ```
 
 available options:
-+ name -- sets the name of the unzipped directory. the zip
-file's name is based on the imported file's name if using
-`file-loader?name=[name].zip`
-+ exclude -- an array of strings to exclude. strings are written
-from config file's directory, e.g. a subdirectory `images` would
-be written `images/`
-+ include -- an array of strings to include
++ name -- sets the name of base directory within the zip.
+the zip file's name is based on the imported file's name
+if using `file-loader?name=[name].zip`
++ exclude -- an array of strings, converted to regular
+expressions in the loader, to exclude. directories are
+written relative to config file's directory, e.g. a
+directory `images` at the same level as the config file
+would be matched by `images/` but not `/images/`. any
+directories that resolve to empty due to exclusion are
+omitted from the zip
++ include -- same format as exclude. only listed files
+or regex-matching files are included in zip.

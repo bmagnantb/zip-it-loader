@@ -2,8 +2,7 @@
 	"zip-it-config": true,
 	"name": "read-these",
 	"include": [
-		"heart-of-darkness.txt",
-		"melville/bartleby-the-scrivener.txt",
-		"melville/moby-dick.txt"
+		"^heart-of-darkness.txt$",
+		"melville"
 	]
 }

@@ -25,8 +25,11 @@ var makeSpyAddDependency = function(addedDependencies) {
 	}
 }
 
-var booksFilePaths = [
+var testFilePaths = [
+	'books/bartleby-the-scrivener.txt',
+	'books/heart-of-darkness.png',
 	'books/heart-of-darkness.txt',
+	'books/heart-of-darkness.txt2',
 	'books/phantastes.txt',
 	'books/melville/moby-dick.txt',
 	'books/melville/bartleby-the-scrivener.txt',
@@ -86,13 +89,13 @@ describe('zip-it-loader', function() {
 
 		it('should return a zip of directory containing source file', function() {
 			var files = zipResult.files
-			expect(files).to.have.all.keys(booksFilePaths.concat('books/old-books.json'))
+			expect(files).to.have.all.keys(testFilePaths.concat('books/old-books.json'))
 			expect(files).to.have.property('books/').that.has.property('dir', true)
 			expect(files).to.have.property('books/melville/').that.has.property('dir', true)
 		})
 
 		it('should add all files as dependencies', function() {
-			expect(addedDependencies).to.have.length(6)
+			expect(addedDependencies).to.have.length(testFilePaths.length)
 		})
 	})
 
@@ -146,12 +149,13 @@ describe('zip-it-loader', function() {
 			context('with exclude field', function() {
 				it('should not have excluded files', function() {
 					var files = zipResult.files
-					var newFilePaths = booksFilePaths.filter(function(val) {
-						var unprefixedFile = val.substr(val.indexOf('/') + 1)
-						return options.exclude.indexOf(unprefixedFile) === -1
-					}).map(function(val) {
-						return options.name + val.substr(val.indexOf('/'))
-					})
+					var newFilePaths = [
+						'old-books/phantastes.txt',
+						'old-books/melville/moby-dick.txt',
+						'old-books/',
+						'old-books/melville/',
+						'old-books/test.json'
+					]
 					expect(files).to.have.all.keys(newFilePaths.concat(options.name + '/books.js'))
 				})
 			})
@@ -175,12 +179,13 @@ describe('zip-it-loader', function() {
 
 				it('should only have included files', function() {
 					var files = zipResult2.files
-					var newFilePaths = booksFilePaths.filter(function(val) {
-						var unprefixedFile = val.substr(val.indexOf('/') + 1)
-						return options2.include.indexOf(unprefixedFile) !== -1 || unprefixedFile.indexOf('.') === -1
-					}).map(function(val) {
-						return options2.name + val.substr(val.indexOf('/'))
-					})
+					var newFilePaths = [
+						'read-these/heart-of-darkness.txt',
+						'read-these/',
+						'read-these/melville/',
+						'read-these/melville/bartleby-the-scrivener.txt',
+						'read-these/melville/moby-dick.txt',
+					]
 					expect(files).to.have.all.keys(newFilePaths)
 				})
 			})
